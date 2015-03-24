@@ -23,6 +23,7 @@ import static org.junit.Assert.assertFalse;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URI;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.Before;
@@ -96,5 +97,23 @@ public class PojoGeneratorTest {
 		ClassName className = generator.generateInternal(mapping.getTarget(), mapping);
 		assertEquals(mapping.getClassName(), className);
 		assertFalse(writeSourceCalled.get());
+	}
+
+	@Test
+	public void generateMappingForTypeSetsMappingTargetToType() {
+		URI type = URI.create("http://example.com/#" + UUID.randomUUID().toString());
+		PojoGenerator generator = new PojoGenerator(null, null, null);
+		Mapping mapping = generator.generateMapping(type);
+		assertEquals(type, mapping.getTarget());
+	}
+
+	@Test
+	public void generateMappingUsesDefaultPackageFeature() {
+		URI type = URI.create("http://example.com/#" + UUID.randomUUID().toString());
+		PojoGenerator generator = new PojoGenerator(null, null, null);
+		String packageName = "some.package" + UUID.randomUUID().toString();
+		generator.setFeature(PojoGenerator.FEATURE_DEFAULT_PACKAGE_NAME, packageName);
+		Mapping mapping = generator.generateMapping(type);
+		assertEquals(packageName, mapping.getClassName().getPackageName());
 	}
 }
