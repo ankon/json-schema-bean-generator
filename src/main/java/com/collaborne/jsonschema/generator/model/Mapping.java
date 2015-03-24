@@ -28,24 +28,33 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 public class Mapping {
 	private URI target;
 	private ClassName className;
-	
+
+	public Mapping() {
+		// For jackson
+	}
+
+	public Mapping(URI target, ClassName className) {
+		this.target = target;
+		this.className = className;
+	}
+
 	public URI getTarget() {
 		return target;
 	}
-	
+
 	public void setTarget(URI target) {
 		this.target = target;
 	}
-	
+
 	@JsonDeserialize(converter=ClassNameConverter.class)
 	public ClassName getClassName() {
 		return className;
 	}
-	
+
 	public void setClassName(ClassName className) {
 		this.className = className;
 	}
-	
+
 	@Override
 	public String toString() {
 		return "Mapping(" + target + " -> " + className + ")";

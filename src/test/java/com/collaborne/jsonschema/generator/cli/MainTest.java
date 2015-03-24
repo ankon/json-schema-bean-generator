@@ -112,9 +112,7 @@ public class MainTest {
 		SchemaLoader schemas = loadSchema(rootUri, "/schemas/simple.json");
 		generator.setSchemaLoader(schemas);
 		
-		Mapping rootMapping = new Mapping();
-		rootMapping.setTarget(URI.create("http://example.com/schemas/simple.json#/definitions/type"));
-		rootMapping.setClassName(new ClassName("com.example.test.schemas", "Type"));
+		Mapping rootMapping = new Mapping(URI.create("http://example.com/schemas/simple.json#/definitions/type"), new ClassName("com.example.test.schemas", "Type"));
 		generator.addMapping(rootMapping.getTarget(), rootMapping);
 		
 		main.generate(Collections.singleton(rootMapping.getTarget()));
@@ -134,9 +132,7 @@ public class MainTest {
 		SchemaLoader schemas = loadSchema(rootUri, "/schemas/inline.json");
 		generator.setSchemaLoader(schemas);
 
-		Mapping rootMapping = new Mapping();
-		rootMapping.setTarget(URI.create("http://example.com/schemas/inline.json#"));
-		rootMapping.setClassName(new ClassName("com.example.test.schemas", "WithInline"));
+		Mapping rootMapping = new Mapping(URI.create("http://example.com/schemas/inline.json#"), new ClassName("com.example.test.schemas", "WithInline"));
 		generator.addMapping(rootMapping.getTarget(), rootMapping);
 				
 		main.generate(Collections.singleton(rootMapping.getTarget()));
@@ -156,9 +152,7 @@ public class MainTest {
 		SchemaLoader schemas = loadSchema(rootUri, "/schemas/nested-inline.json");
 		generator.setSchemaLoader(schemas);
 		
-		Mapping rootMapping = new Mapping();
-		rootMapping.setTarget(URI.create("http://example.com/schemas/nested-inline.json#"));
-		rootMapping.setClassName(new ClassName("com.example.test.schemas", "WithInline"));
+		Mapping rootMapping = new Mapping(URI.create("http://example.com/schemas/nested-inline.json#"), new ClassName("com.example.test.schemas", "WithInline"));
 		generator.addMapping(rootMapping.getTarget(), rootMapping);
 		
 		main.generate(Collections.singleton(rootMapping.getTarget()));
@@ -178,14 +172,10 @@ public class MainTest {
 		SchemaLoader schemas = loadSchema(rootUri, "/schemas/inline.json");
 		generator.setSchemaLoader(schemas);
 		
-		Mapping rootMapping = new Mapping();
-		rootMapping.setTarget(URI.create("http://example.com/schemas/inline.json#"));
-		rootMapping.setClassName(new ClassName("com.example.test.schemas", "WithInline"));
+		Mapping rootMapping = new Mapping(URI.create("http://example.com/schemas/inline.json#"), new ClassName("com.example.test.schemas", "WithInline"));
 		generator.addMapping(rootMapping.getTarget(), rootMapping);
 		
-		Mapping inlineMapping = new Mapping();
-		inlineMapping.setTarget(URI.create("http://example.com/schemas/inline.json#/properties/inline"));
-		inlineMapping.setClassName(new ClassName("com.example.test.schemas", "Inline"));
+		Mapping inlineMapping = new Mapping(URI.create("http://example.com/schemas/inline.json#/properties/inline"), new ClassName("com.example.test.schemas", "Inline"));
 		generator.addMapping(inlineMapping.getTarget(), inlineMapping);
 		
 		main.generate(Arrays.asList(rootMapping.getTarget(), inlineMapping.getTarget()));
