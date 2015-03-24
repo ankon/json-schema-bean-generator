@@ -28,8 +28,10 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -123,12 +125,24 @@ public class PojoGenerator extends AbstractGenerator {
 		}
 	}
 	
-	private static class Buffer extends ByteArrayOutputStream {
+	@VisibleForTesting
+	protected static class Buffer extends ByteArrayOutputStream {
 		public InputStream getInputStream() {
 			return new ByteArrayInputStream(buf);
 		}
 	}
 	
+	private static final List<String> PRIMITIVE_TYPE_NAMES = Arrays.asList(
+		Boolean.TYPE.getName(),
+		Character.TYPE.getName(),
+		Byte.TYPE.getName(),
+		Short.TYPE.getName(),
+		Integer.TYPE.getName(),
+		Long.TYPE.getName(),
+		Float.TYPE.getName(),
+		Double.TYPE.getName()
+	);
+
 	private final Logger logger = LoggerFactory.getLogger(PojoGenerator.class);
 	
 	private final Map<String, PojoTypeGenerator> typeGenerators = new HashMap<>();
@@ -201,6 +215,11 @@ public class PojoGenerator extends AbstractGenerator {
 	 * @throws CodeGenerationException
 	 */
 	protected ClassName generateInternal(URI type, Mapping mapping) throws CodeGenerationException {
+		// If the mapping wants an primitive type, do that (ignoring whatever the schema does)
+		if (isPrimitive(mapping.getClassName())) {
+			return mapping.getClassName();
+		}
+
 		try {
 			// 1. Find the schema for the type
 			SchemaTree schema = getSchema(getSchemaLoader(), type);
@@ -249,6 +268,14 @@ public class PojoGenerator extends AbstractGenerator {
 		} catch (ProcessingException|JsonPointerException|IOException e) {
 			throw new CodeGenerationException(type, e);
 		}
+	}
+
+	@VisibleForTesting
+	protected boolean isPrimitive(ClassName className) {
+		if (!className.getPackageName().isEmpty()) {
+			return false;
+		}
+		return PRIMITIVE_TYPE_NAMES.contains(className.getRawClassName());
 	}
 
 	@VisibleForTesting
@@ -311,6 +338,7 @@ public class PojoGenerator extends AbstractGenerator {
 	 */
 	// XXX: Should this be the default behavior of SchemaLoader#get()?
 	// XXX: review exceptions
+	@VisibleForTesting
 	protected SchemaTree getSchema(SchemaLoader schemaLoader, URI uri) throws ProcessingException, JsonPointerException {
 		String fragment = uri.getFragment();
 		if (fragment == null) {

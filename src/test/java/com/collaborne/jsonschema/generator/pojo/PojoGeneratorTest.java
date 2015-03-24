@@ -17,15 +17,57 @@
  */
 package com.collaborne.jsonschema.generator.pojo;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
+import java.io.IOException;
+import java.io.StringReader;
+import java.net.URI;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import org.junit.Before;
 import org.junit.Test;
 
-public class PojoGeneratorTest {
+import com.collaborne.jsonschema.generator.CodeGenerationException;
+import com.collaborne.jsonschema.generator.java.ClassName;
+import com.collaborne.jsonschema.generator.model.Mapping;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.github.fge.jackson.JsonNodeReader;
+import com.github.fge.jackson.jsonpointer.JsonPointerException;
+import com.github.fge.jsonschema.core.exceptions.ProcessingException;
+import com.github.fge.jsonschema.core.load.SchemaLoader;
+import com.github.fge.jsonschema.core.tree.SchemaTree;
 
-	@Test
-	public void generateInternalPrimitiveTypeReturnsPrimitiveTypeWithoutGeneration() {
-		fail();
+public class PojoGeneratorTest {
+	private JsonNodeReader jsonNodeReader;
+	private SchemaLoader schemaLoader;
+
+	@Before
+	public void setUp() {
+		jsonNodeReader = new JsonNodeReader();
+		schemaLoader = new SchemaLoader();
 	}
 
+	@Test
+	public void generateInternalPrimitiveTypeReturnsPrimitiveTypeWithoutGeneration() throws CodeGenerationException, IOException {
+		JsonNode schemaNode = jsonNodeReader.fromReader(new StringReader("{\"type\": \"string\"}"));
+		SchemaTree schema = schemaLoader.load(schemaNode);
+		Mapping mapping = new Mapping(URI.create("http://example.com/type.json#"), ClassName.create(Integer.TYPE));
+		final AtomicBoolean writeSourceCalled = new AtomicBoolean();
+		PojoGenerator generator = new PojoGenerator(null, null, null) {
+			@Override
+			protected void writeSource(URI type, ClassName className, Buffer buffer) throws java.io.IOException {
+				writeSourceCalled.set(true);
+			}
+
+			@Override
+			protected SchemaTree getSchema(SchemaLoader schemaLoader, URI uri) throws ProcessingException, JsonPointerException {
+				return schema;
+			}
+		};
+
+		ClassName className = generator.generateInternal(mapping.getTarget(), mapping);
+		assertEquals(className, mapping.getClassName());
+		assertFalse(writeSourceCalled.get());
+	}
 }
