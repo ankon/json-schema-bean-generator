@@ -39,6 +39,10 @@ import com.github.fge.jsonschema.core.load.SchemaLoader;
 import com.github.fge.jsonschema.core.tree.SchemaTree;
 
 public class PojoGeneratorTest {
+	private static class TestClass {
+		/* Nothing */
+	}
+
 	private JsonNodeReader jsonNodeReader;
 	private SchemaLoader schemaLoader;
 
@@ -67,7 +71,30 @@ public class PojoGeneratorTest {
 		};
 
 		ClassName className = generator.generateInternal(mapping.getTarget(), mapping);
-		assertEquals(className, mapping.getClassName());
+		assertEquals(mapping.getClassName(), className);
+		assertFalse(writeSourceCalled.get());
+	}
+
+	@Test
+	public void generateInternalExistingTypeReturnsExistingTypeWithoutGeneration() throws CodeGenerationException, IOException {
+		JsonNode schemaNode = jsonNodeReader.fromReader(new StringReader("{\"type\": \"string\"}"));
+		SchemaTree schema = schemaLoader.load(schemaNode);
+		Mapping mapping = new Mapping(URI.create("http://example.com/type.json#"), ClassName.create(TestClass.class));
+		final AtomicBoolean writeSourceCalled = new AtomicBoolean();
+		PojoGenerator generator = new PojoGenerator(null, null, null) {
+			@Override
+			protected void writeSource(URI type, ClassName className, Buffer buffer) throws java.io.IOException {
+				writeSourceCalled.set(true);
+			}
+
+			@Override
+			protected SchemaTree getSchema(SchemaLoader schemaLoader, URI uri) throws ProcessingException, JsonPointerException {
+				return schema;
+			}
+		};
+
+		ClassName className = generator.generateInternal(mapping.getTarget(), mapping);
+		assertEquals(mapping.getClassName(), className);
 		assertFalse(writeSourceCalled.get());
 	}
 }

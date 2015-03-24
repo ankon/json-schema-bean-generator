@@ -215,8 +215,8 @@ public class PojoGenerator extends AbstractGenerator {
 	 * @throws CodeGenerationException
 	 */
 	protected ClassName generateInternal(URI type, Mapping mapping) throws CodeGenerationException {
-		// If the mapping wants an primitive type, do that (ignoring whatever the schema does)
-		if (isPrimitive(mapping.getClassName())) {
+		// If the mapping wants a primitive type or existing type, do that (ignoring whatever the schema does)
+		if (isPrimitive(mapping.getClassName()) || isExistingClass(mapping.getClassName())) {
 			return mapping.getClassName();
 		}
 
@@ -276,6 +276,21 @@ public class PojoGenerator extends AbstractGenerator {
 			return false;
 		}
 		return PRIMITIVE_TYPE_NAMES.contains(className.getRawClassName());
+	}
+
+	@VisibleForTesting
+	protected boolean isExistingClass(ClassName className) {
+		String fqcn = className.getPackageName();
+		if (!fqcn.isEmpty()) {
+			fqcn += ".";
+		}
+		fqcn += className.getRawClassName();
+		try {
+			Class.forName(fqcn);
+			return true;
+		} catch (ClassNotFoundException e) {
+			return false;
+		}
 	}
 
 	@VisibleForTesting
