@@ -36,7 +36,9 @@ import java.util.Collections;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestName;
 
 import com.collaborne.jsonschema.generator.CodeGenerationException;
 import com.collaborne.jsonschema.generator.Generator;
@@ -58,6 +60,11 @@ import com.google.inject.Injector;
 
 // TODO: should always validate the schema first, to avoid bugs caused by invalid schemas
 public class MainTest {
+	private static final String DUMP_DIRECTORY = System.getProperty("debug.dumpDirectory", null);
+
+	@Rule
+	public TestName name = new TestName();
+
 	private FileSystem fs;
 	private Main main;
 	private Generator generator;
@@ -74,7 +81,6 @@ public class MainTest {
 	@After
 	public void tearDown() throws IOException {
 		// Dump the contents of the file system
-		Path dumpTarget = null;
 		Path dumpStart = fs.getPath("/");
 		Files.walkFileTree(dumpStart, new SimpleFileVisitor<Path>() {
 			@Override
@@ -83,7 +89,8 @@ public class MainTest {
 				System.out.println(new String(Files.readAllBytes(file), StandardCharsets.UTF_8));
 				
 				// Copy the file if wanted
-				if (dumpTarget != null) {
+				if (DUMP_DIRECTORY != null) {
+					Path dumpTarget = Paths.get(DUMP_DIRECTORY, name.getMethodName());
 					Path target = dumpTarget.resolve(dumpStart.relativize(file).toString());
 					Files.createDirectories(target.getParent());
 					Files.copy(file, target, StandardCopyOption.REPLACE_EXISTING);
