@@ -1,0 +1,43 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"id": "http://collaborne.com/schema/1.0/json-schema-bean-generator/mapping",
+	
+	"title": "Mapping definitions",
+	"description": "Mapping definitions for driving the generator",
+
+	"definitions": {
+		"mapping:id": {
+			"type": "string",
+			"format": "uri"
+		},
+		"mapping:mapping": {
+			"type": "object",
+			"description": "A single mapping",
+			
+			"properties": {
+				"target": { 
+					"$ref": "#/definitions/mapping:id",
+					"description": "The JSON Pointer identifying the element"
+				},
+				"javaName": {
+					"type": "string",
+					"description": "Class name for the type, relative to the 'packageName'"
+				}
+			},
+			"additionalProperties": false
+		}
+	}
+	"type": "object",
+	
+	"properties": {
+		"mappings": {
+			"type": "array",
+			"items": { "$ref": "#/definitions/mapping:mapping" },
+			"minItems": 1
+		},
+		"packageName": {
+			"type": "string"
+		}
+		"additionalProperties": false
+	}
+}
