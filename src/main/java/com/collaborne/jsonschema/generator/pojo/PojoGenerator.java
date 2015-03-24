@@ -242,19 +242,24 @@ public class PojoGenerator extends AbstractGenerator {
 			}
 
 			if (buffer.size() > 0) {
-				// Create the file based on the className in the mapping
-				Path outputFile = getClassSourceFile(className);
-				logger.info("{}: Writing {}", type, outputFile);
-			
-				// Write stuff into it
-				Files.createDirectories(outputFile.getParent());
-				Files.copy(buffer.getInputStream(), outputFile, StandardCopyOption.REPLACE_EXISTING);
+				writeSource(type, className, buffer);
 			}
 			
 			return className;
 		} catch (ProcessingException|JsonPointerException|IOException e) {
 			throw new CodeGenerationException(type, e);
 		}
+	}
+
+	@VisibleForTesting
+	protected void writeSource(URI type, ClassName className, Buffer buffer) throws IOException {
+		// Create the file based on the className in the mapping
+		Path outputFile = getClassSourceFile(className);
+		logger.info("{}: Writing {}", type, outputFile);
+
+		// Write stuff into it
+		Files.createDirectories(outputFile.getParent());
+		Files.copy(buffer.getInputStream(), outputFile, StandardCopyOption.REPLACE_EXISTING);
 	}
 	
 	protected Path getClassSourceFile(ClassName className) {
