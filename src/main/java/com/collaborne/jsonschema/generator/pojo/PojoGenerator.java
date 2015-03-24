@@ -137,7 +137,7 @@ public class PojoGenerator extends AbstractGenerator {
 	
 	@Inject
 	@VisibleForTesting
-	protected PojoGenerator(PojoClassGenerator classGenerator, PojoArrayGenerator arrayGenerator) {
+	protected PojoGenerator(PojoClassGenerator classGenerator, PojoArrayGenerator arrayGenerator, PojoStringGenerator stringGenerator) {
 		this.typeGenerators.put("object", classGenerator);
 		this.typeGenerators.put("array", arrayGenerator);
 		if (getFeature(FEATURE_USE_SIMPLE_PLAIN_TYPES)) {
@@ -145,10 +145,12 @@ public class PojoGenerator extends AbstractGenerator {
 			//       types (for example we provide a base library for each of the plain types, and configure them
 			//       to check the restrictions), or we could simply ignore those.
 			this.typeGenerators.put("string", new SimplePojoTypeGenerator(ClassName.create(String.class)));
-			this.typeGenerators.put("integer", new SimplePojoTypeGenerator(ClassName.create(Integer.TYPE)));
-			this.typeGenerators.put("number", new SimplePojoTypeGenerator(ClassName.create(Double.TYPE))); 
-			this.typeGenerators.put("boolean", new SimplePojoTypeGenerator(ClassName.create(Boolean.TYPE)));
+		} else {
+			this.typeGenerators.put("string", stringGenerator);
 		}
+		this.typeGenerators.put("integer", new SimplePojoTypeGenerator(ClassName.create(Integer.TYPE)));
+		this.typeGenerators.put("number", new SimplePojoTypeGenerator(ClassName.create(Double.TYPE))); 
+		this.typeGenerators.put("boolean", new SimplePojoTypeGenerator(ClassName.create(Boolean.TYPE)));
 	}
 	
 	@Override
