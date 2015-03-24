@@ -74,7 +74,7 @@ public class MainTest {
 	@After
 	public void tearDown() throws IOException {
 		// Dump the contents of the file system
-		Path dumpTarget = Paths.get("/home/andreas/project/generated-json-schema-beans");
+		Path dumpTarget = null;
 		Path dumpStart = fs.getPath("/");
 		Files.walkFileTree(dumpStart, new SimpleFileVisitor<Path>() {
 			@Override
