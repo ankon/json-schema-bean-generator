@@ -85,7 +85,6 @@ class PojoClassGenerator extends AbstractPojoTypeGenerator {
 			
 			JsonPointer propertyPointer = pointer.append(field.getKey());
 			// XXX: what about "relative" references, won't adding a '#' break resolving those? Are those legal?
-			// FIXME: (upstream?): #getLoadingRef() returns the original source, not translated to our root
 			URI elementUri = schema.getLoadingRef().getLocator().resolve("#" + propertyPointer.toString());
 			if (!visitSchema(elementUri, field.getValue(), schemaVisitor)) {
 				// XXX: can there be meta information here?
