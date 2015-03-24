@@ -26,6 +26,10 @@
 	<scm>
 		<url>https://github.com/Collaborne/json-schema-bean-generator.git</url>
 	</scm>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
 	
 	<licenses>
 		<license>
