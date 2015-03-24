@@ -153,12 +153,11 @@ public class Main {
 		// We're not adding a path redirection here, because that changes the path of the loaded schemas to the redirected location.
 		// FIXME: This really looks like a bug in the SchemaLoader itself!
 		URITranslatorConfiguration uriTranslatorConfiguration = URITranslatorConfiguration.newBuilder()
-				.setNamespace(rootUri)
-        		.freeze();
-    
-		
+			.setNamespace(rootUri)
+			.freeze();
+
 		LoadingConfigurationBuilder loadingConfigurationBuilder = LoadingConfiguration.newBuilder()
-				.setURITranslatorConfiguration(uriTranslatorConfiguration);
+			.setURITranslatorConfiguration(uriTranslatorConfiguration);
 
 		// ... instead, we use a custom downloader which executes the redirect
 		Map<String, URIDownloader> downloaders = loadingConfigurationBuilder.freeze().getDownloaderMap();
