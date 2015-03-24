@@ -185,7 +185,7 @@ public class MainTest {
 		
 		Mapping inlineMapping = new Mapping();
 		inlineMapping.setTarget(URI.create("http://example.com/schemas/inline.json#/properties/inline"));
-		rootMapping.setClassName(new ClassName("com.example.test.schemas", "Inline"));
+		inlineMapping.setClassName(new ClassName("com.example.test.schemas", "Inline"));
 		generator.addMapping(inlineMapping.getTarget(), inlineMapping);
 		
 		main.generate(Arrays.asList(rootMapping.getTarget(), inlineMapping.getTarget()));
