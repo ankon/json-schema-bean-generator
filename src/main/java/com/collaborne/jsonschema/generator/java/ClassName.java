@@ -49,7 +49,15 @@ public class ClassName {
 	
 	public static ClassName create(Class<?> actualClass, ClassName... typeArguments) {
 		Package actualPackage = actualClass.getPackage();
-		return new ClassName(actualPackage == null ? "" : actualPackage.getName(), actualClass.getSimpleName(), typeArguments);
+		String packageName = actualPackage == null ? "" : actualPackage.getName();
+		String className = actualClass.getName();
+		String rawClassName;
+		if (packageName.isEmpty()) {
+			rawClassName = className;
+		} else {
+			rawClassName = className.substring(packageName.length() + 1);
+		}
+		return new ClassName(packageName, rawClassName, typeArguments);
 	}
 	
 	public static ClassName parse(String fqcn) {
