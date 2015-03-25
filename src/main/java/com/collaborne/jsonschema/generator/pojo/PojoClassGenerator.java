@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -45,10 +44,8 @@ import com.google.common.annotations.VisibleForTesting;
  * Generator for a "class" with properties.
  */
 class PojoClassGenerator extends AbstractPojoTypeGenerator {
-	// FIXME: exception handling ... 
 	private interface PropertyVisitor<T extends Exception> {
-		// FIXME: should be a SchemaTree, not a JsonNode
-		void visitProperty(String propertyName, URI type, JsonNode schemaNode) throws T;
+		void visitProperty(String propertyName, URI type, SchemaTree schema) throws T;
 		void visitProperty(String propertyName, URI type) throws T;
 	}
 	
@@ -61,31 +58,30 @@ class PojoClassGenerator extends AbstractPojoTypeGenerator {
 	}
 
 	protected <T extends Exception> boolean visitProperties(SchemaTree schema, PojoClassGenerator.PropertyVisitor<T> visitor) throws T {
-		JsonPointer pointer = schema.getPointer().append("properties");
-		
 		JsonNode propertiesNode = schema.getNode().get("properties");
 		if (propertiesNode == null || !propertiesNode.isContainerNode()) {
 			return false;
 		}
 		
-		for (Iterator<Map.Entry<String, JsonNode>> fieldIterator = propertiesNode.fields(); fieldIterator.hasNext(); ) {
-			Map.Entry<String, JsonNode> field = fieldIterator.next();
+		for (Iterator<String> fieldIterator = propertiesNode.fieldNames(); fieldIterator.hasNext(); ) {
+			String fieldName = fieldIterator.next();
+
+			SchemaTree propertySchema = schema.append(JsonPointer.of("properties", fieldName));
 			PojoClassGenerator.SchemaVisitor<T> schemaVisitor = new PojoClassGenerator.SchemaVisitor<T>() {
 				@Override
-				public void visitSchema(URI type, JsonNode schemaNode) throws T {
-					visitor.visitProperty(field.getKey(), type, schemaNode);
+				public void visitSchema(URI type, SchemaTree schema) throws T {
+					visitor.visitProperty(fieldName, type, schema);
 				}
 				
 				@Override
 				public void visitSchema(URI type) throws T {
-					visitor.visitProperty(field.getKey(), type);
+					visitor.visitProperty(fieldName, type);
 				}
 			};
 			
-			JsonPointer propertyPointer = pointer.append(field.getKey());
 			// XXX: what about "relative" references, won't adding a '#' break resolving those? Are those legal?
-			URI elementUri = schema.getLoadingRef().getLocator().resolve("#" + propertyPointer.toString());
-			if (!visitSchema(elementUri, field.getValue(), schemaVisitor)) {
+			URI elementUri = propertySchema.getLoadingRef().toURI().resolve("#" + propertySchema.getPointer().toString());
+			if (!visitSchema(elementUri, propertySchema, schemaVisitor)) {
 				// XXX: can there be meta information here?
 				// XXX: context information missing here
 				logger.warn("{}: not a container value");
@@ -100,7 +96,7 @@ class PojoClassGenerator extends AbstractPojoTypeGenerator {
 		
 		SchemaVisitor<RuntimeException> schemaVisitor = new SchemaVisitor<RuntimeException>() {
 			@Override
-			public void visitSchema(URI type, JsonNode schemaNode) {
+			public void visitSchema(URI type, SchemaTree schema) {
 				visitSchema(type);
 			}
 			
@@ -112,7 +108,7 @@ class PojoClassGenerator extends AbstractPojoTypeGenerator {
 		
 		visitProperties(schema, new PropertyVisitor<RuntimeException>() {
 			@Override
-			public void visitProperty(String propertyName, URI type, JsonNode schemaNode) {
+			public void visitProperty(String propertyName, URI type, SchemaTree schema) {
 				visitProperty(propertyName, type);
 			}
 			
@@ -124,9 +120,9 @@ class PojoClassGenerator extends AbstractPojoTypeGenerator {
 		
 		// Check if "additionalProperties" is a schema as well, if so we need to be able to resolve that one.
 		if (schema.getNode().hasNonNull("additionalProperties")) {
-			JsonPointer additionalPropertiesPointer = schema.getPointer().append("additionalProperties");
-			URI additionalPropertiesUri = schema.getLoadingRef().getLocator().resolve("#" + additionalPropertiesPointer.toString());
-			visitSchema(additionalPropertiesUri, schema.getNode().get("additionalProperties"), schemaVisitor);
+			SchemaTree additionalPropertiesSchema = schema.append(JsonPointer.of("additionalProperties"));
+			URI additionalPropertiesUri = additionalPropertiesSchema.getLoadingRef().toURI().resolve("#" + additionalPropertiesSchema.getPointer().toString());
+			visitSchema(additionalPropertiesUri, additionalPropertiesSchema, schemaVisitor);
 		}
 		return requiredTypes;
 	}
@@ -140,7 +136,7 @@ class PojoClassGenerator extends AbstractPojoTypeGenerator {
 
 		visitProperties(schema, new PropertyVisitor<CodeGenerationException>() {
 			@Override
-			public void visitProperty(String propertyName, URI type, JsonNode schemaNode) throws CodeGenerationException {
+			public void visitProperty(String propertyName, URI type, SchemaTree schema) throws CodeGenerationException {
 				visitProperty(propertyName, type);
 			}
 

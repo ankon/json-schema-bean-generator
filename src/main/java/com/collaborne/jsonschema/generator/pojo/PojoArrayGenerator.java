@@ -29,7 +29,6 @@ import com.collaborne.jsonschema.generator.java.ClassName;
 import com.collaborne.jsonschema.generator.java.JavaWriter;
 import com.collaborne.jsonschema.generator.java.Kind;
 import com.collaborne.jsonschema.generator.java.Visibility;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jackson.jsonpointer.JsonPointer;
 import com.github.fge.jsonschema.core.tree.SchemaTree;
 import com.google.common.annotations.VisibleForTesting;
@@ -46,14 +45,13 @@ public class PojoArrayGenerator extends AbstractPojoTypeGenerator {
 		// In the easy case we just have type=array, items=SCHEMA, which means we produce a List<SCHEMA-TYPE> reference
 		// In other cases we might have to also produce a class extending AbstractList implementing the restrictions given
 		// XXX: for now we just basically ignore the other restrictions
-		JsonNode itemsNode = schema.getNode().get("items");
-		if (itemsNode != null) {
-			JsonPointer itemsPointer = schema.getPointer().append("items");
-			URI elementUri = schema.getLoadingRef().getLocator().resolve("#" + itemsPointer.toString());
+		if (schema.getNode().hasNonNull("items")) {
+			SchemaTree itemsSchema = schema.append(JsonPointer.of("items"));
+			URI elementUri = schema.getLoadingRef().toURI();
 			AtomicReference<ClassName> elementClassName = new AtomicReference<>();
-			visitSchema(elementUri, itemsNode, new SchemaVisitor<CodeGenerationException>() {
+			visitSchema(elementUri, itemsSchema, new SchemaVisitor<CodeGenerationException>() {
 				@Override
-				public void visitSchema(URI type, JsonNode schemaNode) throws CodeGenerationException {
+				public void visitSchema(URI type, SchemaTree schema) throws CodeGenerationException {
 					visitSchema(type);
 				}
 

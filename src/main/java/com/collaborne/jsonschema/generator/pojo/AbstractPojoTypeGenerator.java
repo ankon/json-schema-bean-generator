@@ -33,8 +33,7 @@ import com.google.common.annotations.VisibleForTesting;
 
 abstract class AbstractPojoTypeGenerator implements PojoTypeGenerator {
 	protected interface SchemaVisitor<T extends Exception> {
-		// FIXME: should be a SchemaTree, not a JsonNode
-		void visitSchema(URI type, JsonNode schemaNode) throws T;
+		void visitSchema(URI type, SchemaTree schema) throws T;
 		void visitSchema(URI type) throws T;
 	}
 	
@@ -68,7 +67,9 @@ abstract class AbstractPojoTypeGenerator implements PojoTypeGenerator {
 	
 	protected abstract void generateType(PojoCodeGenerationContext context, SchemaTree schema, JavaWriter writer) throws IOException, CodeGenerationException;
 	
-	protected <T extends Exception> boolean visitSchema(URI elementUri, JsonNode element, SchemaVisitor<T> visitor) throws T {
+	// XXX: do we need elementUri here, schema knows where it came from.
+	protected <T extends Exception> boolean visitSchema(URI elementUri, SchemaTree schema, SchemaVisitor<T> visitor) throws T {
+		JsonNode element = schema.getNode();
 		if (!element.isContainerNode()) {
 			return false;
 		}
@@ -80,7 +81,7 @@ abstract class AbstractPojoTypeGenerator implements PojoTypeGenerator {
 			String refValue = element.get("$ref").textValue();
 			visitor.visitSchema(elementUri.resolve(refValue));
 		} else {
-			visitor.visitSchema(elementUri, element);
+			visitor.visitSchema(elementUri, schema);
 		}
 		
 		return true;
