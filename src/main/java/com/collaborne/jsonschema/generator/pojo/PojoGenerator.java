@@ -45,6 +45,7 @@ import com.collaborne.jsonschema.generator.CodeGenerationException;
 import com.collaborne.jsonschema.generator.MissingSchemaException;
 import com.collaborne.jsonschema.generator.java.ClassName;
 import com.collaborne.jsonschema.generator.java.JavaWriter;
+import com.collaborne.jsonschema.generator.java.Kind;
 import com.collaborne.jsonschema.generator.model.Mapping;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jackson.jsonpointer.JsonPointer;
@@ -111,6 +112,8 @@ public class PojoGenerator extends AbstractGenerator {
 	public static final Feature<AnonymousClassNameGenerator> FEATURE_CLASS_NAME_GENERATOR = new Feature<>("http://json-schema-bean-generator.collaborne.com/features/LATEST/pojo/class-name-generator", AnonymousClassNameGenerator.class, AnonymousClassNameGenerator.CAMEL_CASE);
 	/** Whether to ignore constraints (enum-ness, min/max value, etc) on non-"object" types */
 	public static final Feature<Boolean> FEATURE_USE_SIMPLE_PLAIN_TYPES = new Feature<>("http://json-schema-bean-generator.collaborne.com/features/LATEST/pojo/simple-plain-types", Boolean.class, Boolean.TRUE);	
+	/** Whether to generate Java 5 {@code enum}s or 'class-with-constants' for JSON schema 'enum's */
+	public static final Feature<Kind> FEATURE_ENUM_STYLE = new Feature<>("http://json-schema-bean-generator.collaborne.com/features/LATEST/pojo/enum-style", Kind.class, Kind.ENUM);
 	
 	private static class SimplePojoTypeGenerator implements PojoTypeGenerator {
 		private final ClassName className;

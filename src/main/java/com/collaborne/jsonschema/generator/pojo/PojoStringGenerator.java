@@ -18,17 +18,80 @@
 package com.collaborne.jsonschema.generator.pojo;
 
 import java.io.IOException;
+import java.util.function.Consumer;
 
 import com.collaborne.jsonschema.generator.CodeGenerationException;
+import com.collaborne.jsonschema.generator.java.ClassName;
 import com.collaborne.jsonschema.generator.java.JavaWriter;
+import com.collaborne.jsonschema.generator.java.Kind;
+import com.collaborne.jsonschema.generator.java.Visibility;
 import com.github.fge.jsonschema.core.tree.SchemaTree;
 
 public class PojoStringGenerator extends AbstractPojoTypeGenerator {
-	@Override
-	protected void generateType(PojoCodeGenerationContext context, SchemaTree schema, JavaWriter writer)
-			throws IOException, CodeGenerationException {
-		// TODO Auto-generated method stub
-
+	private interface EnumGenerator {
+		void generateEnumValue(SchemaTree schemaTree, JavaWriter writer) throws IOException;
+		void generateAdditionalCode(JavaWriter writer) throws IOException;
 	}
 
+	private static class ClassEnumGenerator implements EnumGenerator {
+		@Override
+		public void generateEnumValue(SchemaTree schemaTree, JavaWriter writer) {
+			throw new UnsupportedOperationException("PojoStringGenerator.EnumGenerator#generateEnumValue() is not implemented");
+		}
+
+		@Override
+		public void generateAdditionalCode(JavaWriter writer) {
+			throw new UnsupportedOperationException("PojoStringGenerator.EnumGenerator#generateAdditionalCode() is not implemented");
+		}
+	}
+
+	private static class EnumEnumGenerator implements EnumGenerator {
+		@Override
+		public void generateEnumValue(SchemaTree schemaTree, JavaWriter writer) throws IOException {
+			throw new UnsupportedOperationException("PojoStringGenerator.EnumGenerator#generateEnumValue() is not implemented");
+		}
+
+		@Override
+		public void generateAdditionalCode(JavaWriter writer) throws IOException {
+			writer.writeCode(";");
+		}
+	}
+
+	@Override
+	public ClassName generate(PojoCodeGenerationContext context, SchemaTree schema, JavaWriter writer) throws IOException, CodeGenerationException {
+		if (!schema.getNode().hasNonNull("enum")) {
+			// Not an enum-ish string, so just map it to that.
+			return ClassName.create(String.class);
+		}
+
+		return super.generate(context, schema, writer);
+	}
+
+	@Override
+	protected void generateType(PojoCodeGenerationContext context, SchemaTree schema, JavaWriter writer) throws IOException, CodeGenerationException {
+		EnumGenerator enumGenerator;
+		Kind enumStyle = context.getGenerator().getFeature(PojoGenerator.FEATURE_ENUM_STYLE);
+		switch (enumStyle) {
+		case CLASS:
+			enumGenerator = new ClassEnumGenerator();
+			break;
+		case ENUM:
+			enumGenerator = new EnumEnumGenerator();
+			break;
+		default:
+			throw new CodeGenerationException(context.getType(), new IllegalArgumentException("Invalid enum style: " + enumStyle));
+		}
+
+		writer.writeClassStart(context.getMapping().getClassName(), enumStyle, Visibility.PUBLIC);
+		try {
+			iterateEnumValues(schema, valueSchema -> enumGenerator.generateEnumValue(valueSchema, writer));
+			enumGenerator.generateAdditionalCode(writer);
+		} finally {
+			writer.writeClassEnd();
+		}
+	}
+
+	protected void iterateEnumValues(SchemaTree schemaTree, Consumer<SchemaTree> consumer) throws IOException {
+		// TODO
+	}
 }
