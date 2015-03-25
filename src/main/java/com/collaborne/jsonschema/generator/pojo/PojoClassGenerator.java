@@ -19,7 +19,6 @@ package com.collaborne.jsonschema.generator.pojo;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -96,7 +95,7 @@ class PojoClassGenerator extends AbstractPojoTypeGenerator {
 		return true;
 	}
 	
-	protected Set<URI> getRequiredTypes(SchemaTree schema) throws URISyntaxException {
+	protected Set<URI> getRequiredTypes(SchemaTree schema) {
 		Set<URI> requiredTypes = new HashSet<>();
 		
 		SchemaVisitor<RuntimeException> schemaVisitor = new SchemaVisitor<RuntimeException>() {
