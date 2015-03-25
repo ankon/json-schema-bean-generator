@@ -21,7 +21,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystem;
 import java.nio.file.FileVisitResult;
@@ -48,8 +47,6 @@ import com.collaborne.jsonschema.generator.pojo.PojoGenerator;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jackson.JsonNodeReader;
-import com.github.fge.jackson.jsonpointer.JsonPointerException;
-import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.github.fge.jsonschema.core.load.SchemaLoader;
 import com.github.fge.jsonschema.core.load.configuration.LoadingConfiguration;
 import com.github.fge.jsonschema.core.load.configuration.LoadingConfigurationBuilder;
@@ -100,7 +97,7 @@ public class MainTest {
 		});
 	}
 	
-	private SchemaLoader loadSchema(URI rootUri, String path) throws IOException, ProcessingException {
+	private SchemaLoader loadSchema(URI rootUri, String path) throws IOException {
 		LoadingConfigurationBuilder loadingConfigurationBuilder = LoadingConfiguration.newBuilder();
 		
 		JsonNode schemaNode = new JsonNodeReader().fromInputStream(getClass().getResourceAsStream(path));
@@ -110,7 +107,7 @@ public class MainTest {
 	}
 	
 	@Test
-	public void runSmokeTest() throws IOException, ProcessingException, URISyntaxException, JsonPointerException, CodeGenerationException {
+	public void runSmokeTest() throws IOException, CodeGenerationException {
 		URI rootUri = URI.create("http://example.com/");
 		
 		Path outputDirectory = fs.getPath("output");
@@ -129,7 +126,7 @@ public class MainTest {
 	}
 	
 	@Test
-	public void runSmokeTestInline() throws IOException, ProcessingException, URISyntaxException, JsonPointerException, CodeGenerationException {
+	public void runSmokeTestInline() throws IOException, CodeGenerationException {
 		// XXX: only really checks #resolve()
 		URI rootUri = URI.create("http://example.com/");
 		
@@ -149,7 +146,7 @@ public class MainTest {
 	}
 	
 	@Test
-	public void runSmokeTestInlineNested() throws IOException, ProcessingException, URISyntaxException, JsonPointerException, CodeGenerationException {
+	public void runSmokeTestInlineNested() throws IOException, CodeGenerationException {
 		// XXX: only really checks #resolve()
 		URI rootUri = URI.create("http://example.com/");
 		
@@ -169,7 +166,7 @@ public class MainTest {
 	}
 	
 	@Test
-	public void runSmokeTestInlineExplicitMapping() throws IOException, ProcessingException, URISyntaxException, JsonPointerException, CodeGenerationException {
+	public void runSmokeTestInlineExplicitMapping() throws IOException, CodeGenerationException {
 		// XXX: only really checks #resolve()
 		URI rootUri = URI.create("http://example.com/");
 		
