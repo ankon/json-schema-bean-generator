@@ -19,23 +19,11 @@ package com.collaborne.jsonschema.generator.pojo;
 
 import java.io.IOException;
 
-import javax.inject.Inject;
-
 import com.collaborne.jsonschema.generator.CodeGenerationException;
 import com.collaborne.jsonschema.generator.java.JavaWriter;
-import com.collaborne.jsonschema.generator.java.Kind;
-import com.collaborne.jsonschema.generator.java.Visibility;
 import com.github.fge.jsonschema.core.tree.SchemaTree;
-import com.google.common.annotations.VisibleForTesting;
 
 public class PojoStringGenerator extends AbstractPojoTypeGenerator {
-	@Inject
-	@VisibleForTesting
-	protected PojoStringGenerator() {
-		// XXX: Should use Kind.CLASS for old-school enums
-		super(Kind.ENUM, Visibility.PUBLIC);
-	}
-	
 	@Override
 	protected void generateType(PojoCodeGenerationContext context, SchemaTree schema, JavaWriter writer)
 			throws IOException, CodeGenerationException {

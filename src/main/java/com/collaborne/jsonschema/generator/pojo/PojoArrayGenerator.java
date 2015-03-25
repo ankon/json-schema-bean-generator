@@ -22,24 +22,13 @@ import java.net.URI;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
-import javax.inject.Inject;
-
 import com.collaborne.jsonschema.generator.CodeGenerationException;
 import com.collaborne.jsonschema.generator.java.ClassName;
 import com.collaborne.jsonschema.generator.java.JavaWriter;
-import com.collaborne.jsonschema.generator.java.Kind;
-import com.collaborne.jsonschema.generator.java.Visibility;
 import com.github.fge.jackson.jsonpointer.JsonPointer;
 import com.github.fge.jsonschema.core.tree.SchemaTree;
-import com.google.common.annotations.VisibleForTesting;
 
 public class PojoArrayGenerator extends AbstractPojoTypeGenerator {
-	@Inject
-	@VisibleForTesting
-	protected PojoArrayGenerator() {
-		super(Kind.CLASS, Visibility.PUBLIC);
-	}
-
 	@Override
 	public ClassName generate(PojoCodeGenerationContext context, SchemaTree schema, JavaWriter writer) throws IOException, CodeGenerationException {
 		// In the easy case we just have type=array, items=SCHEMA, which means we produce a List<SCHEMA-TYPE> reference

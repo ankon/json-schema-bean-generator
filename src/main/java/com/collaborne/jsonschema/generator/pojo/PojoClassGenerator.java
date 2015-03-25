@@ -25,8 +25,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import javax.inject.Inject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +36,6 @@ import com.collaborne.jsonschema.generator.model.Mapping;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jackson.jsonpointer.JsonPointer;
 import com.github.fge.jsonschema.core.tree.SchemaTree;
-import com.google.common.annotations.VisibleForTesting;
 
 /**
  * Generator for a "class" with properties.
@@ -51,12 +48,6 @@ class PojoClassGenerator extends AbstractPojoTypeGenerator {
 	
 	private final Logger logger = LoggerFactory.getLogger(PojoClassGenerator.class);
 	
-	@Inject
-	@VisibleForTesting
-	protected PojoClassGenerator() {
-		super(Kind.CLASS, Visibility.PUBLIC);
-	}
-
 	protected <T extends Exception> boolean visitProperties(SchemaTree schema, PojoClassGenerator.PropertyVisitor<T> visitor) throws T {
 		JsonNode propertiesNode = schema.getNode().get("properties");
 		if (propertiesNode == null || !propertiesNode.isContainerNode()) {
@@ -150,7 +141,7 @@ class PojoClassGenerator extends AbstractPojoTypeGenerator {
 			propertyGenerator.generateImports(writer);
 		}
 		
-		writer.writeClassStart(mapping.getClassName(), getKind(), getVisibility());
+		writer.writeClassStart(mapping.getClassName(), Kind.CLASS, Visibility.PUBLIC);
 		try {
 			// Write properties
 			for (PojoPropertyGenerator propertyGenerator : propertyGenerators) {

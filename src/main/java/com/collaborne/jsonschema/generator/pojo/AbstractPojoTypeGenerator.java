@@ -20,39 +20,16 @@ package com.collaborne.jsonschema.generator.pojo;
 import java.io.IOException;
 import java.net.URI;
 
-import javax.inject.Inject;
-
 import com.collaborne.jsonschema.generator.CodeGenerationException;
 import com.collaborne.jsonschema.generator.java.ClassName;
 import com.collaborne.jsonschema.generator.java.JavaWriter;
-import com.collaborne.jsonschema.generator.java.Kind;
-import com.collaborne.jsonschema.generator.java.Visibility;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jsonschema.core.tree.SchemaTree;
-import com.google.common.annotations.VisibleForTesting;
 
 abstract class AbstractPojoTypeGenerator implements PojoTypeGenerator {
 	protected interface SchemaVisitor<T extends Exception> {
 		void visitSchema(URI type, SchemaTree schema) throws T;
 		void visitSchema(URI type) throws T;
-	}
-	
-	private final Kind kind;
-	private final Visibility visibility;
-	
-	@Inject
-	@VisibleForTesting
-	protected AbstractPojoTypeGenerator(Kind kind, Visibility visibility) {
-		this.kind = kind;
-		this.visibility = visibility;
-	}
-	
-	protected Kind getKind() {
-		return kind;
-	}
-	
-	protected Visibility getVisibility() {
-		return visibility;
 	}
 	
 	@Override
