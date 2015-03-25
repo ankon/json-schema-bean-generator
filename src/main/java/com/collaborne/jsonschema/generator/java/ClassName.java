@@ -17,6 +17,9 @@
  */
 package com.collaborne.jsonschema.generator.java;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -99,5 +102,19 @@ public class ClassName {
 			appendable.append(">");
 		}
 		return appendable;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(packageName, rawClassName) ^ Objects.hash((Object[]) typeArguments);
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		if (!(other instanceof ClassName)) {
+			return false;
+		}
+		ClassName otherClassName = (ClassName) other;
+		return Objects.equals(packageName, otherClassName.packageName) && Objects.equals(rawClassName, otherClassName.rawClassName) && Arrays.equals(typeArguments, otherClassName.typeArguments);
 	}
 }
